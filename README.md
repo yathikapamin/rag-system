@@ -19,13 +19,13 @@ Module 5: Orchestrator
 
 ## Modules Overview
 
- Module                                       Input                                                                  Output                                             
+ Module                             ->           Input                               ->                                    Output                                             
 
- Module 1 — PDF Extraction                 | PDF document uploaded by user                                         | Extracted text, page-wise images, page details     
- Module 2 — LLM Processing & Summarization | Output from Module 1 (text/images/page details)                       | Summarized text/content                            
- Module 3 — Embedding Generation           | Output from Module 2 (summarized text)                                | Embedding vectors                                  
- Module 4 — Vector Database Storage        | Output from Module 3 (embeddings) + summary + metadata + page details | Stored vector records in vector database           
- Module 5 — Orchestrator                   | Controls inputs/outputs of all modules                                | Complete pipeline execution and module integration 
+ Module 1 — PDF Extraction                 -> (input) PDF document uploaded by user                                       ->(output)    Extracted text, page-wise images, page details     
+ Module 2 — LLM Processing & Summarization  ->(input) Output from Module 1 (text/images/page details)                       ->(output)  Summarized text/content                            
+ Module 3 — Embedding Generation             ->(input)Output from Module 2 (summarized text)                                 -> (output) Embedding vectors                                  
+ Module 4 — Vector Database Storage           ->(input)Output from Module 3 (embeddings) + summary + metadata + page details    ->(output)Stored vector records in vector database           
+ Module 5 — Orchestrator                     -> (input)Controls inputs/outputs of all modules                                 -> (output) Complete pipeline execution and module integration 
 
 ## Important Instructions for Contributors
 
