@@ -19,12 +19,34 @@ Module 5: Orchestrator
 
 ## Modules Overview
 
-Module 1	Reads PDF documents, extracts text and images page-wise
-Module 2	Sends extracted content to LLM for summarization
-Module 3	Converts summarized text into embeddings
-Module 4	Stores embeddings and metadata in vector database
-Module 5	Orchestrates and manages the complete workflow
-Important Instructions for Contributors
+ Module                                       Input                                                                  Output                                             
+
+ Module 1 — PDF Extraction                 | PDF document uploaded by user                                         | Extracted text, page-wise images, page details     
+ Module 2 — LLM Processing & Summarization | Output from Module 1 (text/images/page details)                       | Summarized text/content                            
+ Module 3 — Embedding Generation           | Output from Module 2 (summarized text)                                | Embedding vectors                                  
+ Module 4 — Vector Database Storage        | Output from Module 3 (embeddings) + summary + metadata + page details | Stored vector records in vector database           
+ Module 5 — Orchestrator                   | Controls inputs/outputs of all modules                                | Complete pipeline execution and module integration 
+
+## Important Instructions for Contributors
+
+ Common Data Format
+
+All modules should follow a common structured data format for smooth integration.
+
+Example format:
+
+{
+    "document_name": "sample.pdf",
+    "page": 1,
+    "text": "Extracted text",
+    "images": ["img1.png"],
+    "summary": "Summarized content",
+    "embedding": [0.12, 0.44, 0.91],
+    "metadata": {
+        "page_number": 1,
+        "location": "Page 1"
+    }
+}
 
 Each module is developed independently by a contributor/team member.
 
