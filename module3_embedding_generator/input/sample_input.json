@@ -1,0 +1,9 @@
+{
+    "document_id": "DOC001",
+    "page_number": 1,
+    "content_type": "text",
+    "original_content": "Artificial Intelligence is transforming industries.",
+    "generated_summary": "AI is transforming industries through automation.",
+    "summary_length": 52,
+    "processing_status": "success"
+}

@@ -1,0 +1,17 @@
+{
+    "document_id": "DOC001",
+    "page_number": 1,
+    "content_type": "text",
+    "generated_summary": "AI is transforming industries through automation.",
+    "embedding_model": "all-MiniLM-L6-v2",
+    "embedding_dimension": 384,
+    "embedding_vector": [
+        0.123,
+        -0.551
+    ],
+    "metadata": {
+        "summary_length": 52,
+        "timestamp": "2026-05-17T10:30:00"
+    },
+    "processing_status": "success"
+}
