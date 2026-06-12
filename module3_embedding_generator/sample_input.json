@@ -1,0 +1,10 @@
+{
+    "document_id": "doc_001",
+    "page_number": 1,
+    "content_type": "Text",
+    "original_extracted_content": "Photosynthesis is a system of biological processes by which plants convert sunlight into energy.",
+    "generated_summary": "Photosynthesis converts sunlight into chemical energy.",
+    "summary_length": 56,
+    "processing_status": "Success",
+    "timestamp": "2026-06-12T10:30:00"
+}

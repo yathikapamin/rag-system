@@ -1,6 +1,5 @@
 import torch
 from transformers import AutoTokenizer, AutoModel
-from datetime import datetime
 
 
 class ValidationService:
@@ -12,17 +11,22 @@ class ValidationService:
             "document_id",
             "page_number",
             "content_type",
-            "generated_summary"
+            "generated_summary",
+            "summary_length",
+            "processing_status",
+            "timestamp"
         ]
 
         for field in required_fields:
 
             if field not in data:
+
                 raise ValueError(
                     f"Missing required field: {field}"
                 )
 
-        if not data["generated_summary"].strip():
+        if not data["generated_summary"]:
+
             raise ValueError(
                 "generated_summary cannot be empty"
             )
@@ -50,14 +54,20 @@ class EmbeddingService:
             "sentence-transformers/all-MiniLM-L6-v2"
         )
 
-        print("Loading embedding model...")
-
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            self.model_name
+        print(
+            "Loading embedding model..."
         )
 
-        self.model = AutoModel.from_pretrained(
-            self.model_name
+        self.tokenizer = (
+            AutoTokenizer.from_pretrained(
+                self.model_name
+            )
+        )
+
+        self.model = (
+            AutoModel.from_pretrained(
+                self.model_name
+            )
         )
 
     def mean_pooling(
@@ -66,49 +76,73 @@ class EmbeddingService:
         attention_mask
     ):
 
-        token_embeddings = model_output[0]
+        token_embeddings = (
+            model_output[0]
+        )
 
         input_mask_expanded = (
             attention_mask
             .unsqueeze(-1)
-            .expand(token_embeddings.size())
+            .expand(
+                token_embeddings.size()
+            )
             .float()
         )
 
         return (
+
             torch.sum(
-                token_embeddings *
+                token_embeddings
+                *
                 input_mask_expanded,
                 1
             )
+
             /
+
             torch.clamp(
                 input_mask_expanded.sum(1),
                 min=1e-9
             )
         )
 
-    def generate_embedding(self, text):
+    def generate_embedding(
+        self,
+        text
+    ):
 
-        encoded_input = self.tokenizer(
-            text,
-            padding=True,
-            truncation=True,
-            return_tensors="pt"
+        encoded_input = (
+            self.tokenizer(
+                text,
+                padding=True,
+                truncation=True,
+                return_tensors="pt"
+            )
         )
 
         with torch.no_grad():
 
-            model_output = self.model(
-                **encoded_input
+            model_output = (
+                self.model(
+                    **encoded_input
+                )
             )
 
-        embedding = self.mean_pooling(
-            model_output,
-            encoded_input["attention_mask"]
+        embedding = (
+            self.mean_pooling(
+                model_output,
+                encoded_input[
+                    "attention_mask"
+                ]
+            )
         )
 
-        return embedding[0].tolist()
+        return (
+            embedding[0]
+            .cpu()
+            .numpy()
+            .tolist()
+        )
 
 
 class Formatter:
@@ -122,28 +156,47 @@ class Formatter:
         return {
 
             "document_id":
-            input_data["document_id"],
+            input_data[
+                "document_id"
+            ],
 
             "page_number":
-            input_data["page_number"],
+            input_data[
+                "page_number"
+            ],
 
             "content_type":
-            input_data["content_type"],
+            input_data[
+                "content_type"
+            ],
 
             "generated_summary":
-            input_data["generated_summary"],
+            input_data[
+                "generated_summary"
+            ],
+
+            "summary_length":
+            input_data[
+                "summary_length"
+            ],
 
             "embedding_dimension":
-            len(embedding_vector),
+            len(
+                embedding_vector
+            ),
 
             "embedding_vector":
             embedding_vector,
 
             "processing_status":
-            "success",
+            input_data[
+                "processing_status"
+            ],
 
             "timestamp":
-            datetime.now().isoformat()
+            input_data[
+                "timestamp"
+            ]
         }
 
 
@@ -151,7 +204,9 @@ class EmbeddingGenerator:
 
     def __init__(self):
 
-        self.validator = ValidationService()
+        self.validator = (
+            ValidationService()
+        )
 
         self.preprocessor = (
             PreprocessingService()
@@ -161,30 +216,63 @@ class EmbeddingGenerator:
             EmbeddingService()
         )
 
-        self.formatter = Formatter()
+        self.formatter = (
+            Formatter()
+        )
 
-    def process(self, data):
+    def process(
+        self,
+        data
+    ):
 
-        self.validator.validate(data)
+        self.validator.validate(
+            data
+        )
+
+        if (
+            data[
+                "processing_status"
+            ].lower()
+            !=
+            "success"
+        ):
+
+            raise ValueError(
+                "Module 2 processing failed"
+            )
 
         cleaned_text = (
-            self.preprocessor.clean_text(
-                data["generated_summary"]
+
+            self.preprocessor
+            .clean_text(
+                data[
+                    "generated_summary"
+                ]
             )
         )
 
-        data["generated_summary"] = (
+        data[
+            "generated_summary"
+        ] = cleaned_text
+
+        data[
+            "summary_length"
+        ] = len(
             cleaned_text
         )
 
         embedding = (
+
             self.embedding_service
             .generate_embedding(
                 cleaned_text
             )
         )
 
-        return self.formatter.format_output(
-            data,
-            embedding
+        return (
+            self.formatter
+            .format_output(
+                data,
+                embedding
+            )
         )

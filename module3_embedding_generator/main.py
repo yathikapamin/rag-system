@@ -4,10 +4,13 @@ from embedding_module import (
     EmbeddingGenerator
 )
 
+INPUT_FILE = (
+    "sample_input.json"
+)
 
-INPUT_FILE = "sample_input.json"
-
-OUTPUT_FILE = "sample_output.json"
+OUTPUT_FILE = (
+    "sample_output.json"
+)
 
 
 def main():
@@ -20,14 +23,18 @@ def main():
             encoding="utf-8"
         ) as file:
 
-            input_data = json.load(file)
+            input_data = (
+                json.load(file)
+            )
 
         generator = (
             EmbeddingGenerator()
         )
 
-        result = generator.process(
-            input_data
+        output = (
+            generator.process(
+                input_data
+            )
         )
 
         with open(
@@ -37,19 +44,19 @@ def main():
         ) as file:
 
             json.dump(
-                result,
+                output,
                 file,
                 indent=4
             )
 
         print(
-            "Embedding generation successful."
+            "Embeddings generated successfully."
         )
 
-    except Exception as error:
+    except Exception as e:
 
         print(
-            f"Error: {error}"
+            f"Error: {e}"
         )
 
 
