@@ -13,7 +13,7 @@ def run_project_pipeline():
     print(json.dumps(extracted_data, indent=2))
     
     # 2. They pass that data directly into YOUR LLM_Summarizer!
-    print("\n[LLM_Summarizer] Generating AI Summary...")
+    print("\n[LLM_Summarizer] Generating AI Summarization...")
     final_output = process_pdf_reader_data(extracted_data)
     
     # 3. Your module passes the result to the next person!
