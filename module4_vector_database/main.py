@@ -1,7 +1,6 @@
 import json
 from vector_storage import VectorDBStorage
 
-
 def main():
 
     # Read input from Module 3 output
