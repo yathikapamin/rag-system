@@ -1,127 +1,250 @@
 # Module 3 - Embedding Generation Module
-# 1. Module Description
 
+## Project Overview
 
-## Purpose of the Module
-The Embedding Generation Module is responsible for converting summarized text into vector embeddings for semantic search and retrieval in the RAG (Retrieval-Augmented Generation) system.
+The Embedding Generation Module is the third component of the Retrieval-Augmented Generation (RAG) System.
 
-This module receives summarized content generated from Module 2 and transforms the textual information into numerical vector representations using embedding models.
+This module receives summarized content from Module 2 (Summarization Module) and converts the summary into numerical vector embeddings using a pre-trained transformer model.
 
-These embeddings help the Vector Database retrieve semantically relevant information during user queries.
+These embeddings are then passed to Module 4 (Vector Database Storage Module) for indexing and semantic retrieval.
 
 ---
 
-## What the Module Does
-- Receives summarized text from Module 2
+## Objective
+
+The primary objective of this module is to transform human-readable summaries into machine-understandable vector representations that can be efficiently stored and searched in a vector database.
+
+---
+
+## Module Position in RAG Pipeline
+
+```
+PDF Document
+      ↓
+Module 1 - PDF Extraction
+      ↓
+Module 2 - Summarization
+      ↓
+Module 3 - Embedding Generation
+      ↓
+Module 4 - Vector Database Storage
+      ↓
+Module 5 - Orchestrator / Retrieval
+```
+
+---
+
+## Features
+
 - Validates incoming data
 - Cleans and preprocesses summary text
-- Generates embeddings using Sentence Transformer models
-- Creates structured JSON output
-- Sends embedding data to Module 4 (Vector Database Storage)
+- Generates semantic embeddings using transformer models
+- Supports content from:
+  - Text
+  - Images
+  - Tables
+  - Figures
+  - OCR Documents
+  - Mixed PDF Content
+- Produces structured JSON output
+- Ready for Vector Database Integration
 
 ---
 
-# 2. Input Format
-## Accepted Input
-The module accepts JSON data generated from Module 2 (LLM Processing & Summarization Module).
+## Folder Structure
+
+```text
+module3/
+│
+├── embedding_module.py
+├── main.py
+├── sample_input.json
+├── sample_output.json
+├── requirements.txt
+└── README.md
+```
 
 ---
-## Input JSON Structure
+
+## Components Description
+
+### 1. ValidationService
+
+Responsible for validating the input data.
+
+Functions:
+- Checks mandatory fields
+- Verifies summary availability
+- Prevents invalid input processing
+
+---
+
+### 2. PreprocessingService
+
+Responsible for cleaning text before embedding generation.
+
+Functions:
+- Remove extra spaces
+- Normalize text formatting
+- Improve embedding quality
+
+---
+
+### 3. EmbeddingService
+
+Responsible for generating embeddings.
+
+Functions:
+- Load transformer model
+- Convert summary text into vector representation
+- Generate semantic embeddings
+
+Model Used:
+
+```
+sentence-transformers/all-MiniLM-L6-v2
+```
+
+Embedding Dimension:
+
+```
+384
+```
+
+---
+
+### 4. Formatter
+
+Responsible for formatting final output.
+
+Functions:
+- Create structured JSON response
+- Add metadata
+- Add embedding information
+
+---
+
+### 5. EmbeddingGenerator
+
+Main controller class.
+
+Functions:
+- Coordinate all services
+- Execute complete embedding pipeline
+- Return final output
+
+---
+
+## Input Format
+
+The module accepts JSON input from Module 2.
+
+### Sample Input
+
 ```json
 {
     "document_id": "DOC001",
     "page_number": 1,
     "content_type": "text",
-    "original_content": "Artificial Intelligence is transforming industries.",
-    "generated_summary": "AI is transforming industries through automation.",
-    "summary_length": 52,
-    "processing_status": "success"
+    "generated_summary": "Artificial Intelligence is transforming industries through automation and machine learning."
 }
 ```
 
+---
 
-# 3. Output Format
+## Supported Content Types
 
-## Module Output
+### Text
 
-The module returns structured embedding data in JSON format for Module 4 (Vector Database Storage Module).
+```json
+{
+    "content_type": "text"
+}
+```
+
+### Image
+
+```json
+{
+    "content_type": "image"
+}
+```
+
+### Table
+
+```json
+{
+    "content_type": "table"
+}
+```
+
+### Figure
+
+```json
+{
+    "content_type": "figure"
+}
+```
+
+### OCR Content
+
+```json
+{
+    "content_type": "ocr"
+}
+```
+
+### Mixed Content
+
+```json
+{
+    "content_type": "mixed"
+}
+```
 
 ---
 
-## Output JSON Structure
+## Output Format
+
+### Sample Output
 
 ```json
 {
     "document_id": "DOC001",
     "page_number": 1,
     "content_type": "text",
-    "generated_summary": "AI is transforming industries through automation.",
-    "embedding_model": "all-MiniLM-L6-v2",
+    "generated_summary": "Artificial Intelligence is transforming industries through automation and machine learning.",
     "embedding_dimension": 384,
-    "embedding_vector": [0.123, -0.551, 0.771],
-    "metadata": {
-        "summary_length": 52,
-        "timestamp": "2026-05-17T10:30:00"
-    },
-    "processing_status": "success"
+    "embedding_vector": [
+        0.123,
+        -0.456,
+        0.789
+    ],
+    "processing_status": "success",
+    "timestamp": "2026-06-12T12:00:00"
 }
 ```
 
 ---
 
-# 4. Libraries / Technologies Used
-## Programming Language
+## Output Fields Description
 
-- Python 3.x
-
----
-
-## Python Libraries
-
-| Library | Purpose |
-|---|---|
-| sentence-transformers | Generate embeddings |
-| torch | Backend deep learning support |
-| numpy | Numerical operations |
-| json | JSON data handling |
+| Field | Description |
+|---------|-------------|
+| document_id | Unique document identifier |
+| page_number | PDF page number |
+| content_type | Type of extracted content |
+| generated_summary | Summary received from Module 2 |
+| embedding_dimension | Size of embedding vector |
+| embedding_vector | Numerical vector representation |
+| processing_status | Success or Failure |
+| timestamp | Processing time |
 
 ---
 
-## Embedding Model Used
+## Installation
 
-all-MiniLM-L6-v2
-
----
-
-## APIs Used
-
-- No external APIs required
-- Local embedding generation
-
----
-
-## Database
-
-- No database used directly in this module
-- Output is passed to Module 4 for Vector Database Storage
-
----
-
-## Supported Vector Databases (Handled by Module 4)
-
-- ChromaDB
-- Pinecone
-- FAISS
-- Weaviate
-- Milvus
-
----
-
-# 5. How to Run
-
-## Step 1 - Install Dependencies
-
-Run the following command:
+Install required dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -129,19 +252,19 @@ pip install -r requirements.txt
 
 ---
 
-## Step 2 - Verify Input File
-
-Ensure the input JSON file exists:
+## Required Libraries
 
 ```text
-input/sample_input.json
+transformers
+torch
+numpy
 ```
 
 ---
 
-## Step 3 - Execute the Module
+## Execution
 
-Run:
+Run the module using:
 
 ```bash
 python main.py
@@ -149,90 +272,73 @@ python main.py
 
 ---
 
-## Step 4 - Output Generated
-
-The generated embedding output will be saved in:
+## Expected Output
 
 ```text
-output/sample_output.json
+Loading embedding model...
+Embedding generation successful.
 ```
 
 ---
 
-# Required Dependencies
+## Workflow
 
-## requirements.txt
+### Step 1
 
-```text
-sentence-transformers
-torch
-numpy
-```
+Read input JSON.
 
----
+### Step 2
 
-# Module Workflow
+Validate input data.
 
-```text
-Module 2 Output
-        ↓
-Input Validation
-        ↓
-Text Preprocessing
-        ↓
-Embedding Generation
-        ↓
-JSON Formatting
-        ↓
-Output to Module 4
-```
+### Step 3
+
+Clean summary text.
+
+### Step 4
+
+Generate embedding vector.
+
+### Step 5
+
+Format output.
+
+### Step 6
+
+Save output JSON.
 
 ---
 
-# Project Structure
+## Integration with Module 4
 
-```text
-module3_embedding_generator/
-│
-├── main.py
-├── config.py
-├── requirements.txt
-│
-├── models/
-│   └── embedding_model.py
-│
-├── services/
-│   ├── embedding_service.py
-│   ├── preprocessing_service.py
-│   └── validation_service.py
-│
-├── utils/
-│   ├── logger.py
-│   ├── helpers.py
-│   └── formatter.py
-│
-├── input/
-│   └── sample_input.json
-│
-├── output/
-│   └── sample_output.json
-│
-└── README.md
-```
+This module provides the following output to Module 4:
+
+- Document ID
+- Page Number
+- Content Type
+- Summary
+- Embedding Vector
+- Metadata
+
+Module 4 stores this information in a Vector Database for semantic search and retrieval.
 
 ---
 
-# Future Enhancements
+## Future Enhancements
 
+- Support for multiple embedding models
 - Batch embedding generation
-- Multilingual embedding support
 - GPU acceleration
-- API integration
-- Chunk-based embeddings
-- Streaming pipeline support
+- Hybrid embeddings
+- Multilingual embeddings
+- Vector database direct integration
 
 ---
 
-# Contributor
+## Developed For
 
-Module 3 - Embedding Generation 
+Retrieval-Augmented Generation (RAG) System Project
+
+Module 3: Embedding Generation Module
+
+Team Project – AI Based Document Retrieval System

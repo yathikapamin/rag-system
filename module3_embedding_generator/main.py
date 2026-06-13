@@ -1,66 +1,65 @@
 import json
 
-from config import OUTPUT_PATH
+from embedding_module import (
+    EmbeddingGenerator
+)
 
-from services.validation_service import validate_input
-from services.preprocessing_service import clean_text
-from services.embedding_service import generate_embedding
+INPUT_FILE = (
+    "sample_input.json"
+)
 
-from utils.formatter import format_output
-from utils.logger import log
+OUTPUT_FILE = (
+    "sample_output.json"
+)
 
 
 def main():
 
     try:
 
-        log("Loading input data...")
+        with open(
+            INPUT_FILE,
+            "r",
+            encoding="utf-8"
+        ) as file:
 
-        with open("input/sample_input.json", "r") as file:
-            input_data = json.load(file)
+            input_data = (
+                json.load(file)
+            )
 
-        log("Validating input data...")
-
-        validate_input(input_data)
-
-        log("Cleaning summary text...")
-
-        cleaned_summary = clean_text(
-            input_data["generated_summary"]
+        generator = (
+            EmbeddingGenerator()
         )
 
-        input_data["generated_summary"] = cleaned_summary
-
-        log("Generating embeddings...")
-
-        embedding_data = generate_embedding(cleaned_summary)
-
-        log("Formatting final output...")
-
-        final_output = format_output(
-            input_data,
-            embedding_data
+        output = (
+            generator.process(
+                input_data
+            )
         )
 
-        log("Saving output JSON...")
+        with open(
+            OUTPUT_FILE,
+            "w",
+            encoding="utf-8"
+        ) as file:
 
-        with open(OUTPUT_PATH, "w") as outfile:
-            json.dump(final_output, outfile, indent=4)
+            json.dump(
+                output,
+                file,
+                indent=4
+            )
 
-        log("Embedding generation completed successfully!")
+        print(
+            "Embeddings generated successfully."
+        )
 
     except Exception as e:
 
-        error_output = {
-            "processing_status": "failed",
-            "error": str(e)
-        }
-
-        with open(OUTPUT_PATH, "w") as outfile:
-            json.dump(error_output, outfile, indent=4)
-
-        log(f"ERROR: {str(e)}")
+        print(
+            f"Error: {e}"
+        )
 
 
 if __name__ == "__main__":
+
     main()
