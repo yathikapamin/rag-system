@@ -130,3 +130,102 @@ class VectorDBStorage:
             "metadata_path":
                 self.metadata_path
         }
+
+    # ==========================
+    # READ OPERATION
+    # ==========================
+    def read_metadata(self):
+
+        if os.path.exists(
+            self.metadata_path
+        ):
+
+            with open(
+                self.metadata_path,
+                "rb"
+            ) as file:
+
+                data = pickle.load(
+                    file
+                )
+
+            return data
+
+        return []
+
+    # ==========================
+    # UPDATE OPERATION
+    # ==========================
+    def update_record(
+        self,
+        page_number,
+        updated_summary
+    ):
+
+        records = self.read_metadata()
+
+        for record in records:
+
+            if (
+                record["page_number"]
+                == page_number
+            ):
+
+                record[
+                    "summary"
+                ] = updated_summary
+
+        with open(
+            self.metadata_path,
+            "wb"
+        ) as file:
+
+            pickle.dump(
+                records,
+                file
+            )
+
+        return {
+            "status": "success",
+            "message":
+                "Record updated"
+        }
+
+    # ==========================
+    # DELETE OPERATION
+    # ==========================
+    def delete_record(
+        self,
+        page_number
+    ):
+
+        records = self.read_metadata()
+
+        updated_records = []
+
+        for record in records:
+
+            if (
+                record["page_number"]
+                != page_number
+            ):
+
+                updated_records.append(
+                    record
+                )
+
+        with open(
+            self.metadata_path,
+            "wb"
+        ) as file:
+
+            pickle.dump(
+                updated_records,
+                file
+            )
+
+        return {
+            "status": "success",
+            "message":
+                "Record deleted"
+        }
