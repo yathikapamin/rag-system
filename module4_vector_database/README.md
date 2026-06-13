@@ -3,7 +3,7 @@
 ## Module Description
 Module 4 stores embeddings, summaries, and metadata into a vector database for efficient retrieval in the Multimodal RAG system.
 
----
+--- 
 
 ## Purpose
 This module receives embeddings generated from Module 3 and stores them in a vector database along with metadata such as page number, summary, content type, and content location.
